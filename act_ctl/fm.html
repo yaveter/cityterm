@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>File Manager</title>
+ <style type="text/css">
+   .block1 { 
+    width: 50%; 
+    padding: 5px;
+    padding-right: 20px;     
+    float: left;
+   }
+   .block2 { 
+    width: 50%;     
+    padding: 5px;     
+    float: left; 
+    position: relative; 
+    
+   }
+  </style>  
+</head>
+<body>
+<script type="text/javascript">
+	
+function ge(id) {
+	return document.getElementsById(id);
+}
+
+function sendForm(element,what) {
+	var xhr = new XMLHttpRequest(),
+	body = ['\r\n'];
+//	ge('status').innerHTML =element.id	
+//	ge('status').innerHTML =ge('status').innerHTML+':'+what	+'\r\n'
+	
+	body.push('&fileaction='+what+'&filename='+element.id);			
+	xhr.open('POST', '/filelist', true);
+	//xhr.setRequestHeader('Content-Type', 'multipart/form-data; boundary=' + boundary);
+		
+
+	// error handler
+	xhr.onreadystatechange = function() { 
+		if (xhr.readyState != 4) return;
+		if (xhr.status != 200) {
+			ge('status').innerHTML ='\r\nError ' + xhr.status + ': ' + xhr.statusText;
+		} else {
+			ge('status').innerHTML = xhr.responseText;		
+		}  
+	}	
+	//send
+	xhr.send(body);
+	
+	
+}
+</script>
+
+<p>ESP8266 files upload</p>
+<p>Wait for the page to load ...))</p>
+<p><a href="#reboot" id="reboot"  onclick="sendForm(ge(id),'Reboot')" >Reboot</a></p>
+<pre class="block1" id="status"  style ="color:red" ></pre>
+<div class="block1">
+  <table  style="undefined;table-layout: fixed; width: 500px;">
+		<colgroup>
+		<col style="width: 40px;">
+		<col style="width: 180px;">
+		<col style="width: 60px;">
+		<col style="width: 60px;">
+		<col style="width: 60px;">
+		<col style="width: 60px;">
+		</colgroup>
+		luafileslistplaceholder
+<!--	
+		<tr>		   
+		<td><a href="script.lua">script.lua</a></td>
+		<td>12345</td>
+		<td><a href="#script.lua" id="script.lua"  onclick="sendForm(ge(id),'Compile')" >Compile</a></td>
+		<td><a href="#script.lua" id="script.lua"  onclick="sendForm(ge(id),'Remove')">Remove</a>
+		<td><a href="script.lua">Download</a>
+		</tr>
+		<tr>
+		<td><a href="lua_init.lua">lua_init.lua</a></td>
+		<td>12345</td>
+		<td><a href="#lua_init.lua" id="lua_init.lua"   onclick="sendForm(ge(id),'Compile')">Compile</a>
+		<td><a href="#lua_init.lua" id="lua_init.lua"  onclick="sendForm(ge(id),'Remove')"">Remove</a>
+		<td><a href="lua_init.lua">Download</a>
+		 </tr> 
+		 <tr>
+		<td><a href="lua_init.lua">lua_commands.lua</a></td>
+		<td>12345</td>
+		<td><a href="#lua_commands.lua" id="lua_commands.lua"   onclick="sendForm(ge(id),'Compile')">Compile</a>
+		<td><a href="#lua_commands.lua" id="lua_commands.lua"  onclick="sendForm(ge(id),'Remove')"">Remove</a>
+		<td><a href="lua_commands.lua">Download</a>
+		 </tr> 
+-->		 
+	</table> 
+</div>
+<div class="block2"><input type="file" id="file">
+<button id="read">Upload</button>
+</div> 
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+ <!--
+ <script src="/jquery.min.js"></script>
+--> 
+  <script>
+  var LineReader = function (options) {
+  if ( !(this instanceof LineReader) ) {
+    return new LineReader(options);
+  }
+  var internals = this._internals = {};
+  var self = this;
+  internals.reader = new FileReader();
+  internals.chunkSize = ( options && options.chunkSize )
+    ? options.chunkSize
+    : 1024;
+  internals.events = {};
+  internals.canRead = true;
+  internals.reader.onload = function () {
+    internals.chunk += this.result;
+    if ( /\r|\n/.test( internals.chunk ) ) {
+      internals.lines = internals.chunk.match(/[^\r\n]+/g);
+      if (internals.lines==null){
+		  internals.lines=[];
+		  internals.lines.push('\r\n');
+	  } 	  
+	  
+
+		if ( self._hasMoreData() ) {			
+			if (internals.chunk[internals.chunk.length - 1] === '\n') {
+				internals.chunk ='';
+			}		
+			else {  
+				if (internals.lines!==null){
+					internals.lines.pop();		
+				}		
+			}
+		}
+
+	  
+      self._step();
+    } else {
+      if ( self._hasMoreData() ) {
+        return self.read();
+      }
+      if ( internals.chunk.length ) {
+        return self._emit('line', [
+          internals.chunk,
+          self._emit.bind(self, 'end')
+        ]);
+      }
+      self._emit('end');
+    }
+  };
+  internals.reader.onerror = function () {
+    self._emit('error', [ this.error ]);
+  };
+};
+
+LineReader.prototype.on = function (eventName, cb) {
+  this._internals.events[ eventName ] = cb;
+};
+LineReader.prototype.read = function (file) {
+  var internals = this._internals;
+  if (typeof file !== 'undefined') {
+    internals.file = file;
+    internals.fileLength = file.size;
+    internals.readPos = 0;
+    internals.chunk = '';
+    internals.lines = [];
+  }
+  var blob = internals.file.slice( internals.readPos, internals.readPos + internals.chunkSize );
+  internals.readPos += internals.chunkSize;
+  internals.reader.readAsText(blob);
+};
+LineReader.prototype.abort = function () {
+  this._internals.canRead = false;
+};
+LineReader.prototype._step = function () {
+  var internals = this._internals;
+  if (internals.lines.length === 0) {
+    if ( this._hasMoreData() ) {
+      return this.read();
+    }
+    return this._emit('end');
+  }
+  if (internals.canRead) {
+    this._emit('line', [
+      internals.lines.shift(),
+      this._step.bind(this)
+    ]);
+  } else {
+    this._emit('end');
+  }
+};
+LineReader.prototype._hasMoreData = function () {
+  var internals = this._internals;
+  return internals.readPos <= internals.fileLength;
+};
+LineReader.prototype._emit = function (event, args) {
+  var boundEvents = this._internals.events;
+  if ( typeof boundEvents[event] === 'function' ) {
+    boundEvents[event].apply(this, args);
+  }
+};
+  </script>
+  <script>
+	var xhr = new XMLHttpRequest(),			
+		boundary = String(Math.random()).slice(2),
+		boundaryMiddle = '--' + boundary + '\r\n',
+		boundaryLast = '--' + boundary + '--\r\n',
+		fileInp = ge('file'),
+		SendStatus=true,
+		EOF=false,
+		out10=0,
+		body = ['\r\n'];
+		
+	function ge(id) {
+		return document.getElementById(id);
+	}
+    $(function () {
+      var lr = new LineReader({
+        chunkSize: 1
+      });
+
+
+      $('#read').click(function () {
+        var file = $('#file').get(0).files[0];
+        var totalCount = 1;
+	
+    
+		SendStatus=true,
+		EOF=false;
+		
+		
+		
+	
+		//читает построчно файл
+        lr.on('line', function (line, next) {
+			if (SendStatus==false) {
+				ge('status').innerHTML =ge('status').innerHTML +'\r\nAbort send line..';
+				return
+			} 
+		   // request body
+			body = ['\r\n'];
+			body.push('Content-Disposition: form-data; name="'+fileInp.value+'"; line='+totalCount+'\r\n\r\n'+line+'\r\n');	
+			body = body.join(boundaryMiddle) + boundaryLast;
+
+			
+		//	var xhr = new XMLHttpRequest();
+			xhr.open('POST', 'upload', true);
+			xhr.setRequestHeader('Content-Type', 'multipart/form-data; boundary=' + boundary);
+			
+
+			// error handler
+			xhr.onreadystatechange = function() { 
+				if (xhr.readyState != 4) return;
+				if (xhr.status != 200) {
+					ge('status').innerHTML =ge('status').innerHTML +'\r\nError ' + xhr.status + ': ' + xhr.statusText;
+					SendStatus=false		
+				} else {
+					// output result
+					//alert(xhr.responseText);
+					if (! EOF) {
+						if (out10>2) { ge('status').innerHTML ='';  out10=0;}
+						out10++;
+						ge('status').innerHTML =ge('status').innerHTML  + '\r\n Send ' + totalCount + ': ' + line;
+						
+						SendStatus=true
+						totalCount++;	
+						//read next line
+						setTimeout(function () {
+							next();
+						},100);
+					}
+					else
+					{
+						ge('status').innerHTML = xhr.responseText;
+					}					
+				}  
+			}	
+			//send
+			xhr.send(body);				
+					
+        }
+		);
+
+        lr.on('error', function (err) {
+          console.log(err);
+		  ge('status').innerHTML =ge('status').innerHTML  + err;
+        });
+
+        lr.on('end', function () {
+			console.log('Read complete!');
+			body = ['\r\n'];
+			body.push('Content-Disposition: form-data; name="'+fileInp.value+'"; line=-1\r\n\r\n<EOF>\r\n');	
+			body = body.join(boundaryMiddle) + boundaryLast;
+		//	var xhr = new XMLHttpRequest();
+			xhr.open('POST', 'upload', true);
+			xhr.setRequestHeader('Content-Type', 'multipart/form-data; boundary=' + boundary);
+			EOF=true;
+			xhr.send(body);			
+			ge('status').innerHTML =ge('status').innerHTML + '\r\n\r\nSend file!';
+        });
+
+        lr.read(file);
+      });
+
+    });
+  </script>
+</body>
+</html>
