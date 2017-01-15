@@ -2,6 +2,7 @@
 System automation smart home based ESP8266
 
 ACT_CTL - control module, HTTP - server (REST), file manager
+
 SENS_CTL - Sensor Module
 
 ACT_CTL gets data from the sensor module and the user launches the script lua_script.lua.
