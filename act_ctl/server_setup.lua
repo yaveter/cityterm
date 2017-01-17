@@ -84,6 +84,8 @@ if method == "post" and  url=="index.html" then
 				--reboot timeuot 5 sec.
 			    print("reboot timeuot 1 sec.")
 				tmr.alarm(2, 3000, 0, function() node.restart() end)  
+			else
+				dofile("netcfg.lc")
 			end	
 		end
 		
@@ -94,7 +96,7 @@ elseif method=="post" and  url=="parameters.html" then
 			print("error parse parameters.html post")
 			return  --error parse parameters.html post	
 		else
-			assert(loadfile("paramcfg.lc")
+			assert(loadfile("paramcfg.lc"))
 		end		    	
 end
    
@@ -140,31 +142,38 @@ if responseBytes>=0 and (url=="index.html" or url=="parameters.html" ) then
 				line=(string.gsub(line, holder, ident))				
 				if  wifi_ssid~=nil then  line=(string.gsub(line, "placeholder='WiFi Name'", "value='"..wifi_ssid.."'")) end
 				if  wifi_password~=nil then  line=(string.gsub(line, "placeholder='WiFi Password'", "value='"..wifi_password.."'")) end
-				if  wifi_ip~=nil then  line=(string.gsub(line, "placeholder='IP'", "value='"..(wifi_ip or "").."'")) end
-				if  wifi_nm~=nil then  line=(string.gsub(line, "placeholder='Netmask'", "value='"..(wifi_nm or "").."'")) end
-				if  wifi_gw~=nil then  line=(string.gsub(line, "placeholder='Gateway'", "value='"..(wifi_gw or "").."'")) end
-				if  wifi_dhcp_start~=nil then  line=(string.gsub(line, "placeholder='DHCP start'", "value='"..(wifi_dhcp_start or "").."'")) end
-				if  router_wifi_ssid~=nil then  line=(string.gsub(line, "placeholder='Router wifi ssid'", "value='"..(router_wifi_ssid or "").."'")) end
-				if  router_wifi_password~=nil then line=(string.gsub(line, "placeholder='Router wifi password'", "value='"..(router_wifi_password or "").."'")) end 
-				if  iot_url~=nil then  line=(string.gsub(line, "placeholder='IOT_URL'", "value='"..(iot_url or "").."'"))  end  
-				if  iot_channelid~=nil then line=(string.gsub(line, "placeholder='IOT_ChannelId'", "value='"..(iot_channelid or "").."'"))  end 
-				if  iot_writeapikey~=nil then line=(string.gsub(line, "placeholder='IOT_WriteAPIKey'", "value='"..(iot_writeapikey or "").."'")) end 
-				if  postinterval~=nil then  line=(string.gsub(line, "placeholder='Post Interval'", "value='"..(postinterval or "").."'")) end
+				if  wifi_ip~=nil then  line=(string.gsub(line, "placeholder='IP'", "value='"..wifi_ip .."'")) end
+				if  wifi_nm~=nil then  line=(string.gsub(line, "placeholder='Netmask'", "value='"..wifi_nm .."'")) end
+				if  wifi_gw~=nil then  line=(string.gsub(line, "placeholder='Gateway'", "value='"..wifi_gw .."'")) end
+				if  wifi_dhcp_start~=nil then  line=(string.gsub(line, "placeholder='DHCP start'", "value='"..wifi_dhcp_start .."'")) end
+				if  router_wifi_ssid~=nil then  line=(string.gsub(line, "placeholder='Router wifi ssid'", "value='"..router_wifi_ssid .."'")) end
+				if  router_wifi_password~=nil then line=(string.gsub(line, "placeholder='Router wifi password'", "value='"..router_wifi_password .."'")) end 
+				if  iot_url~=nil then  line=(string.gsub(line, "placeholder='IOT_URL'", "value='"..iot_url .."'"))  end  
+				if  iot_channelid~=nil then line=(string.gsub(line, "placeholder='IOT_ChannelId'", "value='"..iot_channelid .."'"))  end 
+				if  iot_writeapikey~=nil then line=(string.gsub(line, "placeholder='IOT_WriteAPIKey'", "value='"..iot_writeapikey .."'")) end 
+				if  postinterval~=nil then  line=(string.gsub(line, "placeholder='Post Interval'", "value='"..postinterval .."'")) end
+				if sensor_apikey then
+					for i,v in ipairs(sensor_apikey) do 
+						if v~="" then 
+							line=(string.gsub(line, "placeholder='Sensor"..i.."_APIKey'", "value='"..v .."'"))
+						end 
+					end
+				end
 			elseif url=="parameters.html" then
 				--insert values in parameters.html
-			    if  nameparam1~=nil then  line=(string.gsub(line, "placeholder='nameparam1'", "value='"..(nameparam1 or "").."'")) end	
-			    if  nameparam2~=nil then  line=(string.gsub(line, "placeholder='nameparam2'", "value='"..(nameparam2 or "").."'")) end	
-			    if  nameparam3~=nil then  line=(string.gsub(line, "placeholder='nameparam3'", "value='"..(nameparam3 or "").."'")) end
-			    if  nameparam2~=nil then  line=(string.gsub(line, "placeholder='nameparam4'", "value='"..(nameparam4 or "").."'")) end	
-			    if  nameparam3~=nil then  line=(string.gsub(line, "placeholder='nameparam5'", "value='"..(nameparam5 or "").."'")) end			   				
-			    if  parameter1~=nil then  line=(string.gsub(line, "placeholder='parameter1'", "value='"..(parameter1 or "").."'")) end	
-			    if  parameter2~=nil then  line=(string.gsub(line, "placeholder='parameter2'", "value='"..(parameter2 or "").."'")) end	
-			    if  parameter3~=nil then  line=(string.gsub(line, "placeholder='parameter3'", "value='"..(parameter3 or "").."'")) end
-			    if  parameter4~=nil then  line=(string.gsub(line, "placeholder='parameter4'", "value='"..(parameter4 or "").."'")) end	
-			    if  parameter5~=nil then  line=(string.gsub(line, "placeholder='parameter5'", "value='"..(parameter5 or "").."'")) end
-				if  lua_init_script~=nil then  line=(string.gsub(line, "placeholder='lua_init_script'", "value='"..(lua_init_script or "").."'")) end
-			    if  lua_script~=nil then  line=(string.gsub(line, "placeholder='lua_script'", "value='"..(lua_script or "").."'")) end
-			    if  lua_commands~=nil then  line=(string.gsub(line, "placeholder='lua_commands'", "value='"..(lua_commands or "").."'")) end	
+				if  nameparam1~=nil then  line=(string.gsub(line, "placeholder='nameparam1'", "value='"..nameparam1 .."'")) end	
+				if  nameparam2~=nil then  line=(string.gsub(line, "placeholder='nameparam2'", "value='"..nameparam2 .."'")) end	
+				if  nameparam3~=nil then  line=(string.gsub(line, "placeholder='nameparam3'", "value='"..nameparam3 .."'")) end
+				if  nameparam2~=nil then  line=(string.gsub(line, "placeholder='nameparam4'", "value='"..nameparam4 .."'")) end	
+				if  nameparam3~=nil then  line=(string.gsub(line, "placeholder='nameparam5'", "value='"..nameparam5 .."'")) end			   				
+				if  parameter1~=nil then  line=(string.gsub(line, "placeholder='parameter1'", "value='"..parameter1 .."'")) end	
+				if  parameter2~=nil then  line=(string.gsub(line, "placeholder='parameter2'", "value='"..parameter2 .."'")) end	
+				if  parameter3~=nil then  line=(string.gsub(line, "placeholder='parameter3'", "value='"..parameter3 .."'")) end
+				if  parameter4~=nil then  line=(string.gsub(line, "placeholder='parameter4'", "value='"..parameter4 .."'")) end	
+				if  parameter5~=nil then  line=(string.gsub(line, "placeholder='parameter5'", "value='"..parameter5 .."'")) end
+				if  lua_init_script~=nil then  line=(string.gsub(line, "placeholder='lua_init_script'", "value='"..lua_init_script .."'")) end
+				if  lua_script~=nil then  line=(string.gsub(line, "placeholder='lua_script'", "value='"..lua_script .."'")) end
+				if  lua_commands~=nil then  line=(string.gsub(line, "placeholder='lua_commands'", "value='"..lua_commands .."'")) end	
 			end
 				--print("line="..line)	
                 conn:send(line) 

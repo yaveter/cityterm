@@ -23,4 +23,6 @@ sr04.init(7, 6,sr4_timer,1000)   -- Every 1 sec. trig_pin=7(GPIO 13),echo_pin=6(
 --sr04.get_distance(function(distance) DIST=distance end) 
 
 sr04.poll_distance(function(distance) SR4_DIST=distance end)  -- Read distance periodically in background.
- 
+
+ --init adc
+ adc.force_init_mode(adc.INIT_VDD33)

@@ -37,6 +37,7 @@ local method=""
 local url=""
 local vars=""
 local StatusUpload=false
+local content_type="Content-Type:  text/html; charset=utf-8\r\n"
 ------------'on receive'-------------------
 conn:on("receive",function(conn, payload) 
 -----------------------------------------
@@ -52,7 +53,7 @@ url=url or ""
 method=string.lower(method)
 
 print("Heap   : " .. node.heap())
---  print("Payload: " .. payload)
+  print("Payload: " .. payload)
 print("Method : " .. method)
 print("URL    : " .. url)
 
@@ -73,8 +74,8 @@ if method == "post" and  url=="index.html" then
 			return   --error parse index.html post
 		else  
 			--parse - OK!save and compile netcfg.lua - OK! 
-			print("parse - OK!Save and compile netcfg.lua - OK!")
-			dofile("netcfg.lc")			
+			print("parse - OK!Save and compile netcfg.lua - OK!")				
+			dofile("netcfg.lc") 
 			if res =="Reboot" then
 			     conn:send("HTTP/1.1 200 OK\r\n\r\n<!doctype html>\r\n<html>\r\n<head>\r\n</head>\r\n<body>\r\nRebooting node...\r\n</body>\r\n</html>\r\n")
 				--reboot timeuot 5 sec.
@@ -91,7 +92,8 @@ elseif method=="post" and  url=="parameters.html" then
 			return  --error parse parameters.html post
 		else
 			dofile("paramcfg.lc")
-		end		    	
+		end	
+		
 end
    
 if url~=nil and url~=""  then
@@ -109,7 +111,7 @@ end
 --response OK, send 200   
 responseBytes = 0
 print("send 200") 
-conn:send("HTTP/1.1 200 OK\r\n\r\n")   
+conn:send("HTTP/1.1 200 OK\r\n"..content_type.."\r\n")  
 collectgarbage()
 end) --end 'on receive'
 

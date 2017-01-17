@@ -31,10 +31,10 @@ local _, _, lua_measure = string.find(vars, "lua_measure\=([^&]+)")
 lua_init_script=lua_init_script or ""
 lua_measure=lua_measure or ""
 	
-print("New parametereters received")
-print("-----------------------------")
-print("lua_init_script : " .. lua_init_script)
-print("lua_measure : " .. lua_measure)
+--print("New parametereters received")
+--print("-----------------------------")
+--print("lua_init_script : " .. lua_init_script)
+--print("lua_measure : " .. lua_measure)
 	
 
 local paramcfg="paramcfg"
@@ -51,7 +51,7 @@ local paramcfg="paramcfg"
     file.flush()
     file.close()
     pcall(node.compile,paramcfg..".lua")
-    file.remove(paramcfg..".lua")
+    --file.remove(paramcfg..".lua")
     if file.open(paramcfg..".lc", "r") then
         file.close()
 		result=true
@@ -59,5 +59,5 @@ local paramcfg="paramcfg"
 		result=false		 
     end
 	
-    collectgarbage()
+   collectgarbage()
     return result

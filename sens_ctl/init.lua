@@ -98,6 +98,7 @@ function enter_sleep(interval)
 	if (wifi.getmode()==0) then
 		tmr.stop(6)
 		tmr.unregister(6)
+		print("Node sleep in "..(interval/1000000).."sec.")
 		node.dsleep(interval,0)
 	end
   end)
@@ -108,11 +109,11 @@ end
 function try_connecting(wifi_ssid, wifi_password, wifi_ip, wifi_nm, wifi_gw,wifi_dhcp_start,router_wifi_ssid,router_wifi_password)
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 gpio.write(LBGI, gpio.HIGH)
-   -- wifi.sta.disconnect()
+    wifi.sta.disconnect()
     wifi.setmode(wifi.STATION)
     wifi.sta.config(wifi_ssid, wifi_password)
     wifi.sta.connect()
-    --wifi.sta.autoconnect(1)
+    wifi.sta.autoconnect(1)
 
     tmr.alarm(0, 2000, 1, function()
         if wifi.sta.status() ~= 5 then
@@ -139,7 +140,7 @@ gpio.write(LBGI, gpio.HIGH)
        end
     end)
 
-    tmr.alarm(1, 15000, 0, function()
+    tmr.alarm(1, 30000, 0, function()
         -- Sleep (save power until WiFi gets back),         
         if wifi.sta.status() ~= 5 then
             tmr.stop(0)
@@ -149,8 +150,8 @@ gpio.write(LBGI, gpio.HIGH)
                 print("Press the button 5 seconds on the next boot to enter WiFi configuration captive mode.")
                 -- No sense to run setup if the settings present. Sleep and retry.  
                 -- Failed to AP connect, blink 3 times and  1 min sleep            
-              gpio.serout(LBGI,1,{300000,300000},3, enter_sleep(1 * 60 * 1000 * 1000))                              
-
+              gpio.serout(LBGI,1,{300000,300000},3, 1)
+              enter_sleep(1 * 60 * 1000 * 1000)	      
         end
     end)
 end

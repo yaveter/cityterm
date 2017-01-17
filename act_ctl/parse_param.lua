@@ -100,7 +100,7 @@ local paramcfg="paramcfg"
     file.flush()
     file.close()
     pcall(node.compile,paramcfg..".lua")
-    file.remove(paramcfg..".lua")
+    --file.remove(paramcfg..".lua")
     if file.open(paramcfg..".lc", "r") then
         file.close()
 		result=true

@@ -59,7 +59,7 @@ responseBytes=0
 	vars=vars or ""
 	url=url or ""
 	print("Heap   : " .. node.heap())
-	print("Payload: " .. payload)
+	--print("Payload: " .. payload)
 	print("Method : " .. method)
 	print("URL    : " .. url)
 	method=string.lower(method)
@@ -84,7 +84,7 @@ responseBytes=0
 			if res  then 
 				if #Values_List.name>0  then
 					--post to IOT
-					if  iot_writeapikey and iot_writeapikey~="" then
+					if  iot_writeapikey and iot_writeapikey~="" and wifi.sta.getip() then
 					   assert(loadfile("post_iot.lc"))(Values_List)
 					end  
 					--run lua_script
@@ -197,7 +197,7 @@ responseBytes=0
 	end
 	
 if url~=nil and url~="" and url~="update"  and url~="commands"  and url~="filelist"  and url~="upload"   then
-	if file.open(url, "r")then
+	if file.open(url, "r") and  url~="index.html"  and  url~="parameters.html" then
 		file.close()
 	else			
 		--illegal url

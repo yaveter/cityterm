@@ -5,26 +5,31 @@ SLA= 0x3c
 disp=nil -- oled display
 
 function print_setup()
-   print("WiFi credentials:")
-    print("-----------------------------")
-    print("wifi_ssid     : " .. (wifi_ssid or ""))
-    print("wifi_password : " .. (wifi_password or ""))
-    print("wifi_ip : " .. (wifi_ip or ""))
-    print("wifi_nm : " .. (wifi_nm or ""))
-    print("wifi_gw : " .. (wifi_gw or ""))
-    print("wifi_dhcp_start : " .. (wifi_dhcp_start or ""))
-    print("router_wifi_ssid     : " .. (router_wifi_ssid or ""))
-    print("router_wifi_password : " .. (router_wifi_password or ""))
-    print("postinterval : " .. (postinterval or ""))
-    print("iot_url : " .. (iot_url or ""))
-    print("iot_channelid : " .. (iot_channelid or ""))
-    print("iot_writeapikey : " .. (iot_writeapikey or ""))
-
-    print("\n\rParameters: ")
-    print("-----------------------------")
-    print("parameter1 : " .. (parameter1 or ""))
-    print("parameter2 : " .. (parameter2 or ""))
-    print("parameter3 : " .. (parameter3 or ""))
+	print("WiFi credentials:")
+	print("-----------------------------")
+	print("wifi_ssid     : " .. (wifi_ssid or ""))
+	print("wifi_password : " .. (wifi_password or ""))
+	print("wifi_ip : " .. (wifi_ip or ""))
+	print("wifi_nm : " .. (wifi_nm or ""))
+	print("wifi_gw : " .. (wifi_gw or ""))
+	print("wifi_dhcp_start : " .. (wifi_dhcp_start or ""))
+	print("router_wifi_ssid     : " .. (router_wifi_ssid or ""))
+	print("router_wifi_password : " .. (router_wifi_password or ""))
+	print("postinterval : " .. (postinterval or ""))
+	print("iot_url : " .. (iot_url or ""))
+	print("iot_channelid : " .. (iot_channelid or ""))
+	print("iot_writeapikey : " .. (iot_writeapikey or ""))
+	if sensor_apikey then
+		for i,v in ipairs(sensor_apikey) do 
+			print("sensor"..i.."_apikey: " .. v)
+		end	
+	end
+    
+	print("\n\rParameters: ")
+	print("-----------------------------")
+	print("parameter1 : " .. (parameter1 or ""))
+	print("parameter2 : " .. (parameter2 or ""))
+	print("parameter3 : " .. (parameter3 or ""))
 	print("parameter4 : " .. (parameter4 or ""))
 	print("parameter5 : " .. (parameter5 or ""))
 	print("lua_init_script : " .. (lua_init_script or ""))
@@ -45,7 +50,7 @@ function run_setup()
     cfg.ssid="CITYTERM"..cid
     cfg.pwd="cityterm123456"
     cfg.auth=wifi.WPA2_PSK
-    --cfg.channel=10
+    cfg.channel=10
     wifi.ap.config(cfg)
     print("Opening WiFi credentials portal")    
     assert(loadfile("server_setup.lc"))(cfg.ssid,cfg.pwd)
@@ -116,6 +121,8 @@ end
 local cfg={}
 cfg.ssid=wifi_ssid
 cfg.pwd=wifi_password
+cfg.auth=wifi.WPA2_PSK
+ cfg.channel=10
 --cfg.save=true
 wifi.ap.config(cfg)
 cfg=nil
@@ -128,6 +135,7 @@ if router_wifi_ssid~=nil and router_wifi_ssid~="" then
 		if  attempt<6 then 
 			if wifi.sta.status() ~= 5 then
 					print("Connecting to AP...")
+					attempt=attempt+1
 			else				
 					tmr.stop(0)
 					print("Connected as: " .. wifi.sta.getip())
@@ -137,7 +145,7 @@ if router_wifi_ssid~=nil and router_wifi_ssid~="" then
 		       end
 		else
 			tmr.stop(0)
-			print("Failed to connect to \"" .. router_wifi_ssid .. "\".")
+			print("Failed connect to \"" .. router_wifi_ssid .. "\".")
 			print("Run server without "  .. router_wifi_ssid)
 			collectgarbage()
 			tmr.unregister(0)

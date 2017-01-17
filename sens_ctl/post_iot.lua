@@ -16,9 +16,14 @@ for i=1,cnt do
 end
 connout = net.createConnection(net.TCP, 0)   
     connout:on("receive", function(connout, payloadout)
-       if (string.find(payloadout, "HTTP/1.1 200 OK") ~= nil) then
-			Message="Posted IOT - OK"
-			Responce=true;
+		if (string.find(payloadout, "HTTP/1.1 200 OK") ~= nil) then
+			if (string.find(payloadout, '"Response":-1') ~= nil) then
+				Message=string.match(payloadout, ".-{(.-)}")
+				Responce=false;
+			else
+				Message="Posted IOT - OK"
+				Responce=true;
+			end			
 			print(Message)	
 		elseif (string.find(payloadout, "HTTP/1.1 400 Bad Request\r\n") ~= nil) then
 			Message="Post IOT Status: 400 Bad Request"

@@ -75,7 +75,7 @@ local netcfg="netcfg"
     file.flush()
     file.close()
     node.compile(netcfg..".lua")
-    file.remove(netcfg..".lua")
+    --file.remove(netcfg..".lua")
 	
 	--save setup flag
     file.open("setup.flag", "w+")

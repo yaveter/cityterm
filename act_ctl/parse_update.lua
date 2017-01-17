@@ -11,6 +11,14 @@ Return: true, fieldslist={name={},value={}} 	- if exist data from senssors
 		
 ---]]----------------
 
+local function search_list(list,val)
+------------------------------
+  for i, v in ipairs(list) do
+    if v == val then return i end
+  end
+  return nil
+end
+
 local vars=...
 local fieldslist={name={},value={}}
 if vars == nil or vars == "" then      
@@ -25,9 +33,9 @@ local msg="Illegal api_key "
 --parse update REST post
 value= string.match(vars, "api_key\=([^&]+)")
 if value then
---check api_key
---api_key must be match chipid AP device
-	if value~=tostring(node.chipid()) then
+	--check api_key
+	--api_key must be defined in setup
+	if search_list(sensor_apikey,value) ==nil then
 		print(msg..value)
 --		display(function() 	disp:drawStr(0, 0,msg) disp:drawStr(0, 12,value) end)
 		return nil,msg

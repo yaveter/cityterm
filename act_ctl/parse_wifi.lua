@@ -60,8 +60,15 @@ iot_channelid=iot_channelid or ""
 _, _, iot_writeapikey =string.find(vars, "iot_writeapikey\=([^&]+)")
 iot_writeapikey=iot_writeapikey or ""
 
-
+local sensor_apikey={}
+for i = 1, 5 do 
+	_, _, sensor_apikey[i] =string.find(vars, "sensor"..i.."_apikey\=([^&]+)")
+	sensor_apikey[i]=sensor_apikey[i] or "" 
+end
     
+
+
+
 
     if postinterval ==nil then
       postinterval=15*60   --15 min default sleep interval
@@ -128,11 +135,16 @@ local netcfg="netcfg"
     file.writeline("iot_url='"..urldecode(iot_url).."'")
     file.writeline("iot_channelid='"..iot_channelid.."'")
     file.writeline("iot_writeapikey='"..iot_writeapikey.."'")
-
+    file.writeline("sensor_apikey={")
+    for i,v in ipairs(sensor_apikey) do 
+	file.writeline('"'..v..'",')
+    end
+      file.writeline("}")
+    
     file.flush()
     file.close()
     node.compile(netcfg..".lua")
-    file.remove(netcfg..".lua")
+  --  file.remove(netcfg..".lua")
     
     --save setup flag
      file.open("setup.flag", "w+")
@@ -154,5 +166,5 @@ local netcfg="netcfg"
 --			     end)
 		result=nil	       
     end	
---    collectgarbage()
+    collectgarbage()
     return result
